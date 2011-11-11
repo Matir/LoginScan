@@ -7,9 +7,9 @@ import ConfigParser
 config = {
     'http': [80,8000,8080],
     'https': [443,8443],
-    'dns': True,
     'verbose': False,
 	'conns': 20,
+    'source': 'hosts',
 
     # Rules
     'rules': {
@@ -34,8 +34,6 @@ def load(argv):
         	config['http'] = parser.get('loginscan','http').split(',')
         if parser.has_option('loginscan','https'):
         	config['https'] = parser.get('loginscan','https').split(',')
-        if parser.has_option('loginscan','dns'):
-        	config['dns'] = parser.getbool('loginscan','dns')
         if parser.has_option('loginscan','conns'):
         	config['conns'] = parser.getint('loginscan','conns')
         if parser.has_option('loginscan','verbose'):
@@ -57,19 +55,24 @@ def load(argv):
     Ranges must have full IPs for start and end.
     Hosts may be comma or space separated.
     You can provide '0' as a port number to disable http or https.
+    Ports are ignored if a url list is provided.
     """
     parser = argparse.ArgumentParser(description="Scan document roots for interesting things.",argument_default=argparse.SUPPRESS,epilog=epilog)
     parser.add_argument("--http",type=port_type,help="Ports to scan with http",metavar='p[,p[..]]')
     parser.add_argument("--https",type=port_type,help="Ports to scan with https",metavar='p[,p[..]]')
-    parser.add_argument("--no-dns",action='store_false',help="Disable all DNS queries",dest='dns')
     parser.add_argument("--verbose","-v",action='store_true',help="Enable extra verbosity")
     parser.add_argument("--conns","-c",type=int,help="Number of simultaneous connections")
-    parser.add_argument("hosts",help="Hosts to scan",nargs='+',type=lambda x: x.split(','))
+    sources = parser.add_mutually_exclusive_group()
+    urls_help = "Treat hostspec as a list of urls to scan, either comma or space separated."
+    sources.add_argument("--urls",help=urls_help,action='store_const',const='urls',dest='source')
+    url_file_help = "Treat hostspec as a file containing a list of URLs, one per line."
+    sources.add_argument("--url-file",help=url_file_help,action='store_const',const='url-file',dest='source')
+    parser.add_argument("hosts",help="Hosts to scan (hostspec)",nargs='+',type=lambda x: x.split(','),metavar='host')
 
     # Parse The Arguments
     args = parser.parse_args(argv)
     # Merge multiple host lists, we'll deal with ranges later
-    args.hosts = [x for x in itertools.chain(*args.hosts)]
+    args.hosts = itertools.chain(*args.hosts)
     config.update(vars(args).iteritems())
 
     # Return the compiled config

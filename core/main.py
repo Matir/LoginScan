@@ -1,5 +1,6 @@
 import re
 import struct
+import sys
 
 import eventlet
 
@@ -68,11 +69,27 @@ def urllist(config):
     This is a generator, wrapping another generator...
     (config,url)
     """
-    for host in hostlist(config['hosts']):
-        for proto in 'http','https':
-            for port in config[proto]:
-                url = "%s://%s:%s/" % (proto,host,port)
-                yield (config,url)
+    if config['source'] == 'hosts':
+        for host in hostlist(config['hosts']):
+            for proto in 'http','https':
+                for port in config[proto]:
+                    url = "%s://%s:%s/" % (proto,host,port)
+                    yield (config,url)
+    elif config['source'] == 'urls':
+        for url in config['hosts']:
+            yield (config,url)
+    elif config['source'] == 'url-file':
+        for urlfile in config['hosts']:
+            if urlfile == '-':
+            	fp = sys.stdin
+            else: 
+            	try:
+                    fp = open(urlfile)
+                except (IOError):
+                    print_error("Unable to open %s as url list file." % urlfile)
+                    continue
+            for line in fp:
+                yield(config,line.strip())
 
 
 class HostError(Exception):
