@@ -31,5 +31,4 @@ def print_error(msg):
     sys.stderr.write('\n')
     sys.stderr.flush()
 
-
 # vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4

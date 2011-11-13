@@ -32,3 +32,5 @@ if __name__ == "__main__":
     use_config = config.load(sys.argv[1:])
     print_verbose(use_config)
     main.go(use_config)
+
+# vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4

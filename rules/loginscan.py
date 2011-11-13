@@ -78,3 +78,5 @@ class PasswordParser(HTMLParser.HTMLParser):
 		attrs = dict(attrs)
 		if attrs.get('type','').lower() == "password":
 			self.foundpw = attrs.get('name',True)
+
+# vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4

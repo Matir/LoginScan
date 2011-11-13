@@ -26,6 +26,7 @@ import eventlet
 
 from core import net
 from core import rules
+from core import output
 from core import print_verbose,print_error
 
 def go(config):
@@ -41,11 +42,17 @@ def go(config):
             pass
     config['ruleset'] = ruleset
 
+    # Get outputs
+    outputs = output.getOutputs(config['output'])
+
     # Build the eventlet pool and fire off processing
     pool = eventlet.GreenPool(config['conns'])
     res = pool.starmap(net.handle_url,urllist(config))
-    for result in res:
-        print result
+
+    # Sort results and print data
+    res = sorted(res,key=lambda val: val[1],reverse=True)
+    for o in outputs:
+    	o.writeall(res)
 
 
 def hostlist(args):
