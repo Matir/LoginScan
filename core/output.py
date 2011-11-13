@@ -100,12 +100,13 @@ class HTMLOutput(GenericOutput):
     """
 
     def header(self):
-        pass
+        self.fp.write("<html><head><title>LoginScan Report</title></head><body><table>");
+        self.fp.write("<tr><th>URL</th><th>Score</th><th>Notes</th></tr>")
 
     def write(self,entry):
-        pass
+        self.fp.write("<tr><td>%s</td><td>%d</td><td>%s</td></tr>" % (entry[0],entry[1],'<br />'.join(entry[2])))
 
     def footer(self):
-        pass
+        self.fp.write("</table></body></html>")
 
 # vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4
