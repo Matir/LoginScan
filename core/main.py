@@ -50,7 +50,7 @@ def go(config):
     res = pool.starmap(net.handle_url,urllist(config))
 
     # Sort results and print data
-    res = sorted(res,key=lambda val: val[1],reverse=True)
+    res = sorted(filter(None,res),key=lambda val: val[1],reverse=True)
     for o in outputs:
     	o.writeall(res)
 

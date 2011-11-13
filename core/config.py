@@ -28,6 +28,7 @@ config = {
     'http': [80,8000,8080],
     'https': [443,8443],
     'verbose': False,
+    'show_noconn': False,
 	'conns': 20,
     'source': 'hosts',
     'output': 'text=-',
@@ -89,6 +90,7 @@ def load(argv):
     parser.add_argument("--verbose","-v",action='store_true',help="Enable extra verbosity")
     parser.add_argument("--conns","-c",type=int,help="Number of simultaneous connections")
     parser.add_argument("--output","-o",help="Output file name and/or type list.")
+    parser.add_argument("--show-noconn",action='store_true',help="Show failed connections in results.")
     sources = parser.add_mutually_exclusive_group()
     urls_help = "Treat hostspec as a list of urls to scan, either comma or space separated."
     sources.add_argument("--urls",help=urls_help,action='store_const',const='urls',dest='source')

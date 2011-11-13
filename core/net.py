@@ -35,7 +35,9 @@ def handle_url(config,url):
     except urllib2.HTTPError as ex:
         pass
     except urllib2.URLError as e:
-        return (url,-1,['Unable to connect: %s' % e])
+        if config['show_noconn']:
+            return (url,-1,['Unable to connect: %s' % e])
+        return None
 
     score = 0
     for rule,weight in config['ruleset']:
