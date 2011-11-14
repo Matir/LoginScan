@@ -94,6 +94,7 @@ class CSVOutput(GenericOutput):
     def header(self):
         self.fp.write('"URL","Score","Notes"\n')
 
+
 class HTMLOutput(GenericOutput):
     """
     Write out to HTML.
@@ -104,7 +105,7 @@ class HTMLOutput(GenericOutput):
         self.fp.write("<tr><th>URL</th><th>Score</th><th>Notes</th></tr>")
 
     def write(self,entry):
-        self.fp.write("<tr><td>%s</td><td>%d</td><td>%s</td></tr>" % (entry[0],entry[1],'<br />'.join(entry[2])))
+        self.fp.write("<tr><td><a href='%s'>%s</a></td><td>%d</td><td>%s</td></tr>" % (entry[0],entry[0],entry[1],'<br />'.join(entry[2])))
 
     def footer(self):
         self.fp.write("</table></body></html>")
