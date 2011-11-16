@@ -31,7 +31,8 @@ def handle_url(config,url):
     messages = []
 
     try:
-        res = urllib2.urlopen(url,timeout=config['timeout'])
+        req = urllib2.Request(url,headers={'User-Agent': config['user_agent']})
+        res = urllib2.urlopen(req,timeout=config['timeout'])
     except urllib2.HTTPError as ex:
         pass
     except urllib2.URLError as e:

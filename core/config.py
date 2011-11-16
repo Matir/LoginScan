@@ -33,6 +33,7 @@ config = {
     'source': 'hosts',
     'output': 'text=-',
     'timeout': 30,
+    'user_agent': 'LoginScan 0.0.1',
 
     # Rules
     'rules': {
@@ -63,6 +64,8 @@ def load(argv):
         	config['verbose'] = parser.getbool('loginscan','verbose')
         if parser.has_option('loginscan','timeout'):
         	config['timeout'] = parser.getint('loginscan','timeout')
+        if parser.has_option('loginscan','user-agent'):
+        	config['user_agent'] = parser.get('loginscan','user-agent')
         # Update rules
         if parser.has_section('rules'):
             config['rules'].update(parser.items('rules'))
@@ -95,6 +98,7 @@ def load(argv):
     parser.add_argument("--timeout","-t",type=int,help="Timeout for connections, in seconds.")
     parser.add_argument("--output","-o",help="Output file name and/or type list.")
     parser.add_argument("--show-noconn",action='store_true',help="Show failed connections in results.")
+    parser.add_argument("--user-agent","-U",help="User Agent String to Send with Requests.")
     sources = parser.add_mutually_exclusive_group()
     urls_help = "Treat hostspec as a list of urls to scan, either comma or space separated."
     sources.add_argument("--urls",help=urls_help,action='store_const',const='urls',dest='source')
