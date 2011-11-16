@@ -32,6 +32,7 @@ config = {
 	'conns': 20,
     'source': 'hosts',
     'output': 'text=-',
+    'timeout': 30,
 
     # Rules
     'rules': {
@@ -60,6 +61,8 @@ def load(argv):
         	config['conns'] = parser.getint('loginscan','conns')
         if parser.has_option('loginscan','verbose'):
         	config['verbose'] = parser.getbool('loginscan','verbose')
+        if parser.has_option('loginscan','timeout'):
+        	config['timeout'] = parser.getint('loginscan','timeout')
         # Update rules
         if parser.has_section('rules'):
             config['rules'].update(parser.items('rules'))
@@ -89,6 +92,7 @@ def load(argv):
     parser.add_argument("--https",type=port_type,help="Ports to scan with https",metavar='p[,p[..]]')
     parser.add_argument("--verbose","-v",action='store_true',help="Enable extra verbosity")
     parser.add_argument("--conns","-c",type=int,help="Number of simultaneous connections")
+    parser.add_argument("--timeout","-t",type=int,help="Timeout for connections, in seconds.")
     parser.add_argument("--output","-o",help="Output file name and/or type list.")
     parser.add_argument("--show-noconn",action='store_true',help="Show failed connections in results.")
     sources = parser.add_mutually_exclusive_group()
