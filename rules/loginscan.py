@@ -19,6 +19,8 @@
 # THE SOFTWARE.
 
 # Default ruleset
+
+import re
 import HTMLParser
 
 from core import rules
@@ -30,7 +32,7 @@ class dummy(rules.LoginScanRule):
 		if data:
 			print data.geturl()
 			print data.info().headers
-			print data.read()
+			print data.body
 		print dir(ex)
 		return (0,None)
 
@@ -44,6 +46,7 @@ class httpauth(rules.LoginScanRule):
 		info = ex.info().getheader('WWW-Authenticate')
 		return (1,'HTTP Authentication: %s' % info)
 
+
 class passwordfield(rules.LoginScanRule):
 	""" Look for an HTML password field """
 	def handle(self,data,ex=None):
@@ -52,7 +55,7 @@ class passwordfield(rules.LoginScanRule):
 			return (0,None)
 
 		parser = PasswordParser()
-		parser.feed(data.read())
+		parser.feed(data.body)
 		res = parser.close()
 		if res:
 			return (1,'Password field found: %s' % res)
@@ -78,5 +81,65 @@ class PasswordParser(HTMLParser.HTMLParser):
 		attrs = dict(attrs)
 		if attrs.get('type','').lower() == "password":
 			self.foundpw = attrs.get('name',True)
+
+
+class apacheindexpage(rules.LoginScanRule):
+    """ Look for an Apache Index Page """
+    def handle(self,data,ex=None):
+        # Only works if we got data
+        if not data:
+        	return (0,None)
+        
+        parser = ApacheIndexParser()
+        parser.feed(data.body)
+        res = parser.close()
+        if res == 1:
+        	return (1,'Apache Index Page Found!')
+        elif res:
+            return (res,'Probable Apache Index Page!')
+
+        return (0,None)
+
+
+class ApacheIndexParser(HTMLParser.HTMLParser):
+    """ Parse for criteria for an Apache Index Page """
+    def __init__(self):
+        HTMLParser.HTMLParser.__init__(self)
+        self.title = 0
+        self.address = 0
+        self.links = 0
+        self.linkrule = re.compile(r'\?C=[NMSD];O=[AD]')
+        self.tagstack = []
+
+    def close(self):
+        HTMLParser.HTMLParser.close(self)
+        # Get the score, but only return up to 1
+        # Only return up to 1
+        return min((self.title * 2 + self.links + self.address * 2)/(7.0),1)
+
+    def handle_starttag(self,tag,attrs):
+        self.tagstack.append(tag)
+        if tag=='a':
+            # Get href component
+            attrs = dict(attrs)
+            href = attrs.get('href','')
+            if self.linkrule.match(href):
+            	self.links += 1
+
+    def handle_endtag(self,tag):
+        if tag == self.tagstack[-1]:
+        	self.tagstack.pop()
+
+    def handle_data(self,data):
+        # Ignore if we have no tags
+        if not self.tagstack:
+        	return
+
+        last_tag = self.tagstack[-1]
+        if last_tag=='title' and 'Index of ' in data:
+            self.title = 1
+        if last_tag=='address' and 'Apache/' in data:
+            self.address = 1
+
 
 # vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4

@@ -40,6 +40,11 @@ def handle_url(config,url):
         return None
 
     score = 0
+
+    # Copy the data out once
+    if res:
+    	res.body = res.read()
+
     for rule,weight in config['ruleset']:
     	rscore,message = rule.handle(res,ex)
         score += weight * rscore
