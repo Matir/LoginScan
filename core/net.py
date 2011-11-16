@@ -20,6 +20,7 @@
 
 from eventlet.green import socket
 from eventlet.green import urllib2
+from eventlet.green import httplib
 import struct
 
 from core import rules
@@ -35,9 +36,13 @@ def handle_url(config,url):
         res = urllib2.urlopen(req,timeout=config['timeout'])
     except urllib2.HTTPError as ex:
         pass
-    except urllib2.URLError as e:
+    except httplib.BadStatusLine as ex:
         if config['show_noconn']:
-            return (url,-1,['Unable to connect: %s' % e])
+            return (url,-1,['Not an HTTP Service: %s' % ex])
+        return None
+    except (urllib2.URLError,socket.timeout) as ex:
+        if config['show_noconn']:
+            return (url,-1,['Unable to connect: %s' % ex])
         return None
 
     score = 0
