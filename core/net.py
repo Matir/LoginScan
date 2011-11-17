@@ -27,6 +27,7 @@ from core import rules
 
 def handle_url(config,url):
     """Handle a single url"""
+    status = None
     res = None
     ex = None
     messages = []
@@ -38,11 +39,11 @@ def handle_url(config,url):
         pass
     except httplib.BadStatusLine as ex:
         if config['show_noconn']:
-            return (url,-1,['Not an HTTP Service: %s' % ex])
+            return (url,-1,None,['Not an HTTP Service: %s' % ex])
         return None
     except (urllib2.URLError,socket.timeout) as ex:
         if config['show_noconn']:
-            return (url,-1,['Unable to connect: %s' % ex])
+            return (url,-1,None,['Unable to connect: %s' % ex])
         return None
 
     score = 0
@@ -50,6 +51,9 @@ def handle_url(config,url):
     # Copy the data out once
     if res:
     	res.body = res.read()
+    	status = res.code
+    elif isinstance(ex,urllib2.HTTPError):
+        status = ex.code
 
     for rule,weight in config['ruleset']:
     	rscore,message = rule.handle(res,ex)
@@ -57,7 +61,7 @@ def handle_url(config,url):
         if message:
             messages.append(message)
 
-    return (url,score,messages)
+    return (url,score,status,messages)
     
 
 def ip2int(ip):

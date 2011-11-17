@@ -66,7 +66,7 @@ class GenericOutput(object):
 
     def write(self,entry):
         """Write a single entry to output, taking a tuple."""
-        self.fp.write("%-32s %5d %s\n" % (entry[0],entry[1],' '.join(entry[2])))
+        self.fp.write("%-32s %5d %4s %s\n" % (entry[0],entry[1],entry[2] if entry[2] else '',' '.join(entry[3])))
 
     def writeall(self,data):
         """Write all entries"""
@@ -76,7 +76,7 @@ class GenericOutput(object):
 
     def header(self):
         """Write a header"""
-        self.fp.write("%-32s %5s %s\n" % ("URL","Score","Notes"))
+        self.fp.write("%-32s %5s %4s %s\n" % ("URL","Score","HTTP","Notes"))
 
     def footer(self):
         """Write a footer if needed"""
@@ -89,10 +89,10 @@ class CSVOutput(GenericOutput):
     """
 
     def write(self,entry):
-        self.fp.write("\"%s\",\"%d\",\"%s\"\n" % (entry[0],entry[1],';'.join(entry[2])))
+        self.fp.write("\"%s\",\"%d\",\"%s\",\"%s\"\n" % (entry[0],entry[1],entry[2] if entry[2] else '',';'.join(entry[3])))
 
     def header(self):
-        self.fp.write('"URL","Score","Notes"\n')
+        self.fp.write('"URL","Score","HTTP","Notes"\n')
 
 
 class HTMLOutput(GenericOutput):
@@ -102,10 +102,11 @@ class HTMLOutput(GenericOutput):
 
     def header(self):
         self.fp.write("<html><head><title>LoginScan Report</title></head><body><table>");
-        self.fp.write("<tr><th>URL</th><th>Score</th><th>Notes</th></tr>")
+        self.fp.write("<tr><th>URL</th><th>Score</th><th>HTTP Status</th><th>Notes</th></tr>")
 
     def write(self,entry):
-        self.fp.write("<tr><td><a href='%s'>%s</a></td><td>%d</td><td>%s</td></tr>" % (entry[0],entry[0],entry[1],'<br />'.join(entry[2])))
+        self.fp.write("<tr><td><a href='%s'>%s</a></td><td>%d</td><td>%s</td><td>%s</td></tr>" % 
+                (entry[0],entry[0],entry[1],entry[2] if entry[2] else '','<br />'.join(entry[3])))
 
     def footer(self):
         self.fp.write("</table></body></html>")
