@@ -20,6 +20,8 @@
 
 # Define how rules are handled
 
+import HTMLParser
+
 class LoginScanRule:
     """
     Basic Framework for a LoginScan Rule
@@ -46,5 +48,29 @@ def loadRule(name):
     for piece in name.split('.')[1:]:
         mod = getattr(mod,piece)
     return mod
+
+class PageTitle(HTMLParser.HTMLParser):
+    """
+    Get the title from an HTML Response
+    """
+    def getTitle(self,data):
+        self.title = ""
+        self.intitle = False
+        self.feed(data)
+        self.close()
+        return self.title
+
+    def handle_starttag(self,tag,attrs):
+        if tag == 'title':
+        	self.intitle = True
+
+    def handle_data(self,data):
+        if self.intitle:
+        	self.title = data
+
+    def handle_endtag(self,tag):
+        if tag == 'title':
+        	self.intitle = False
+
 
 # vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4

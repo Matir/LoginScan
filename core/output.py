@@ -66,7 +66,7 @@ class GenericOutput(object):
 
     def write(self,entry):
         """Write a single entry to output, taking a tuple."""
-        self.fp.write("%-32s %5d %4s %s\n" % (entry[0],entry[1],entry[2] if entry[2] else '',' '.join(entry[3])))
+        self.fp.write("%-32s %5d %4s %s\n" % (entry[0],entry[1],entry[2] if entry[2] else '','; '.join(entry[3])))
 
     def writeall(self,data):
         """Write all entries"""

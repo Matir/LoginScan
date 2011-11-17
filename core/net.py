@@ -48,10 +48,13 @@ def handle_url(config,url):
 
     score = 0
 
-    # Copy the data out once
+    # Copy the data out once, get the status code, and the title
     if res:
     	res.body = res.read()
     	status = res.code
+    	pagetitle = rules.PageTitle().getTitle(res.body)
+        if pagetitle:
+            messages.append('Title: '+pagetitle)
     elif isinstance(ex,urllib2.HTTPError):
         status = ex.code
 
