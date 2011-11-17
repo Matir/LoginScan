@@ -79,18 +79,20 @@ def load(argv):
 
     # Set up the arg parser
     epilog = """
-    Host specification:
-    - Hosts may be specified as hostnames, - separated ranges, or CIDR blocks.
-    - Ranges must have full IPs for start and end.
-    - Hosts may be comma or space separated.
-    Ports:
-    - You can provide '0' as a port number to disable http or https.
-    - Ports are ignored if a url list is provided.
-    Outputs:
-    - Outputs are specified as type=filename.  If type= is omitted, text is default.  - may be specified for standard output.
-    - HTML, CSV, and Plaintext outputs are supported.  (html,csv,text)
+Host specification:
+  - Hosts may be specified as hostnames, - separated ranges, or CIDR blocks.
+  - Ranges must have full IPs for start and end.
+  - Hosts may be comma or space separated.
+Ports:
+  - You can provide '0' as a port number to disable http or https.
+  - Ports are ignored if a url list is provided.
+Outputs:
+  - Outputs are specified as type=filename.  If type= is omitted, text is default.
+  - "-" May be specified to output to standard output.
+  - HTML, CSV, and Plaintext outputs are supported.  (html,csv,text)
     """
-    parser = argparse.ArgumentParser(description="Scan document roots for interesting things.",argument_default=argparse.SUPPRESS,epilog=epilog)
+    parser = argparse.ArgumentParser(description="Scan document roots for interesting things.",
+            argument_default=argparse.SUPPRESS,epilog=epilog,formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--http",type=port_type,help="Ports to scan with http",metavar='p[,p[..]]')
     parser.add_argument("--https",type=port_type,help="Ports to scan with https",metavar='p[,p[..]]')
     parser.add_argument("--verbose","-v",action='store_true',help="Enable extra verbosity")
